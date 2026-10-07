@@ -1065,6 +1065,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1117304311}
+  - component: {fileID: 1117304312}
   m_Layer: 0
   m_Name: Memory_2210
   m_TagString: Untagged
@@ -1093,6 +1094,18 @@ Transform:
   - {fileID: 1197684677}
   m_Father: {fileID: 821930647}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1117304312
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1117304310}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: feb06e590afd59a448611e830ed0da68, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MemoryLayer
 --- !u!1 &1197684676
 GameObject:
   m_ObjectHideFlags: 0
@@ -1581,6 +1594,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1817326600}
+  - component: {fileID: 1817326601}
   m_Layer: 0
   m_Name: Memory_1840
   m_TagString: Untagged
@@ -1609,6 +1623,18 @@ Transform:
   - {fileID: 1013249465}
   m_Father: {fileID: 821930647}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1817326601
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1817326599}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: feb06e590afd59a448611e830ed0da68, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MemoryLayer
 --- !u!1 &1820839508
 GameObject:
   m_ObjectHideFlags: 0
