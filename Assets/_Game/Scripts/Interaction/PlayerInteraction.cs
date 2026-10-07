@@ -16,8 +16,13 @@ namespace DoNotRemember.Interaction
 
         private Interactable currentInteractable;
 
+        private bool interactionEnabled = true;
+
         private void Update()
         {
+            if (!interactionEnabled)
+                return;
+
             FindInteractable();
 
             if (currentInteractable != null &&
@@ -82,6 +87,21 @@ namespace DoNotRemember.Interaction
 
             interactionPrompt.text =
                 $"[F] {currentInteractable.InteractionText}";
+        }
+
+        public void SetInteractionEnabled(bool enabled)
+        {
+            interactionEnabled = enabled;
+
+            if (!enabled)
+            {
+                currentInteractable = null;
+
+                if (interactionPrompt != null)
+                {
+                    interactionPrompt.text = "";
+                }
+            }
         }
     }
 }

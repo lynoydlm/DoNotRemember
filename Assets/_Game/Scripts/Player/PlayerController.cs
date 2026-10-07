@@ -20,6 +20,8 @@ namespace DoNotRemember.Player
         private float verticalVelocity;
         private float cameraPitch;
 
+        private bool controlsEnabled = true;
+
         private void Awake()
         {
             controller = GetComponent<CharacterController>();
@@ -32,6 +34,9 @@ namespace DoNotRemember.Player
 
         private void Update()
         {
+            if (!controlsEnabled)
+                return;
+
             HandleCursor();
             HandleMovement();
 
@@ -92,6 +97,7 @@ namespace DoNotRemember.Player
             transform.Rotate(Vector3.up * mouseX);
 
             cameraPitch -= mouseY;
+
             cameraPitch = Mathf.Clamp(
                 cameraPitch,
                 -maxLookAngle,
@@ -115,6 +121,20 @@ namespace DoNotRemember.Player
                 Cursor.lockState != CursorLockMode.Locked)
             {
                 LockCursor();
+            }
+        }
+
+        public void SetControlsEnabled(bool enabled)
+        {
+            controlsEnabled = enabled;
+
+            if (enabled)
+            {
+                LockCursor();
+            }
+            else
+            {
+                UnlockCursor();
             }
         }
 

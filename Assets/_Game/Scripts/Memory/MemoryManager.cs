@@ -15,6 +15,7 @@ namespace DoNotRemember.Memory
         private int currentMemoryIndex;
 
         private bool memoryInitialized;
+        private bool memoryInputEnabled = true;
 
         public MemoryLayer CurrentMemory
         {
@@ -58,6 +59,9 @@ namespace DoNotRemember.Memory
 
         private void Update()
         {
+            if (!memoryInputEnabled)
+                return;
+
             if (Keyboard.current == null)
                 return;
 
@@ -109,6 +113,10 @@ namespace DoNotRemember.Memory
             ActivateMemory(previousIndex);
         }
 
+        public void SetMemoryInputEnabled(bool enabled)
+        {
+            memoryInputEnabled = enabled;
+        }
         public void ActivateMemory(
             int index,
             bool clearUnanchoredItems = true)
