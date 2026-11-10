@@ -14,12 +14,12 @@ namespace DoNotRemember.Core
         [Header("Notification")]
         [SerializeField] private float notificationDuration = 2.5f;
 
-        private readonly Dictionary<string, string> items = new();
+        private readonly HashSet<MemoryObjectData> items = new();
 
-        private string lastCollectedItemId;
+        private MemoryObjectData lastCollectedItem;
         private float notificationTimer;
 
-        public string LastCollectedItemId => lastCollectedItemId;
+        public MemoryObjectData LastCollectedItem => lastCollectedItem;
 
         private void Awake()
         {
@@ -50,68 +50,60 @@ namespace DoNotRemember.Core
             }
         }
 
-        public bool AddItem(string itemId, string itemName)
+        public bool AddItem(MemoryObjectData itemData)
         {
-            if (string.IsNullOrWhiteSpace(itemId))
+            if (itemData == null)
             {
                 Debug.LogError(
-                    "InventoryManager: Item ID is empty."
+                    "InventoryManager: Item Data is missing."
                 );
 
                 return false;
             }
 
-            if (items.ContainsKey(itemId))
+            if (items.Contains(itemData))
                 return false;
 
-            items.Add(itemId, itemName);
+            items.Add(itemData);
 
-            lastCollectedItemId = itemId;
+            lastCollectedItem = itemData;
 
             ShowNotification(
-                $"{itemName} added\n[R] Anchor item"
+                $"{itemData.DisplayName} added\n[R] Anchor item"
             );
 
             Debug.Log(
-                $"Inventory: added {itemId}"
+                $"Inventory added: {itemData.ObjectId}"
             );
 
             return true;
         }
 
-        public bool HasItem(string itemId)
+        public bool HasItem(MemoryObjectData itemData)
         {
-            return items.ContainsKey(itemId);
+            return itemData != null &&
+                   items.Contains(itemData);
         }
 
-        public string GetItemName(string itemId)
+        public bool RemoveItem(MemoryObjectData itemData)
         {
-            if (items.TryGetValue(
-                    itemId,
-                    out string itemName))
-            {
-                return itemName;
-            }
+            if (itemData == null)
+                return false;
 
-            return itemId;
-        }
-
-        public List<string> GetItemIdsSnapshot()
-        {
-            return new List<string>(items.Keys);
-        }
-
-        public bool RemoveItem(string itemId)
-        {
-            bool removed = items.Remove(itemId);
+            bool removed = items.Remove(itemData);
 
             if (removed &&
-                lastCollectedItemId == itemId)
+                lastCollectedItem == itemData)
             {
-                lastCollectedItemId = null;
+                lastCollectedItem = null;
             }
 
             return removed;
+        }
+
+        public List<MemoryObjectData> GetItemsSnapshot()
+        {
+            return new List<MemoryObjectData>(items);
         }
 
         public void ShowNotification(string message)

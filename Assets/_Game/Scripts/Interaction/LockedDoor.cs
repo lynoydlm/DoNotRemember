@@ -7,7 +7,7 @@ namespace DoNotRemember.Interaction
     public class LockedDoor : Interactable
     {
         [Header("Lock")]
-        [SerializeField] private string requiredItemId = "apartment_key";
+        [SerializeField] private MemoryObjectData requiredObject;
 
         [Header("Door")]
         [SerializeField] private float openAngle = 90f;
@@ -60,7 +60,16 @@ namespace DoNotRemember.Interaction
                 return;
             }
 
-            if (!InventoryManager.Instance.HasItem(requiredItemId))
+            if (requiredObject == null)
+            {
+                Debug.LogError(
+                    $"{name}: Required Object is missing."
+                );
+
+                return;
+            }
+
+            if (!InventoryManager.Instance.HasItem(requiredObject))
             {
                 InventoryManager.Instance.ShowNotification(
                     "The door is locked."
@@ -69,7 +78,7 @@ namespace DoNotRemember.Interaction
                 return;
             }
 
-            if (!AnchorManager.Instance.IsAnchored(requiredItemId))
+            if (!AnchorManager.Instance.IsAnchored(requiredObject))
             {
                 InventoryManager.Instance.ShowNotification(
                     "The object is not anchored in this reconstruction."

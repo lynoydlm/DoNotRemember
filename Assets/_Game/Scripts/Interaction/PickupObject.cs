@@ -5,9 +5,8 @@ namespace DoNotRemember.Interaction
 {
     public class PickupObject : Interactable
     {
-        [Header("Item")]
-        [SerializeField] private string itemId = "item";
-        [SerializeField] private string itemName = "Item";
+        [Header("Object Data")]
+        [SerializeField] private MemoryObjectData objectData;
 
         private Renderer[] itemRenderers;
         private Collider[] itemColliders;
@@ -37,11 +36,17 @@ namespace DoNotRemember.Interaction
                 return;
             }
 
-            bool added =
-                InventoryManager.Instance.AddItem(
-                    itemId,
-                    itemName
+            if (objectData == null)
+            {
+                Debug.LogError(
+                    $"{name}: MemoryObjectData is not assigned."
                 );
+
+                return;
+            }
+
+            bool added =
+                InventoryManager.Instance.AddItem(objectData);
 
             if (!added)
                 return;
@@ -51,28 +56,27 @@ namespace DoNotRemember.Interaction
 
         private void RefreshVisibility()
         {
-            if (InventoryManager.Instance == null)
+            if (InventoryManager.Instance == null ||
+                objectData == null)
             {
                 SetVisible(true);
                 return;
             }
 
             bool playerHasItem =
-                InventoryManager.Instance.HasItem(itemId);
+                InventoryManager.Instance.HasItem(objectData);
 
             SetVisible(!playerHasItem);
         }
 
         private void SetVisible(bool visible)
         {
-            foreach (Renderer itemRenderer
-                     in itemRenderers)
+            foreach (Renderer itemRenderer in itemRenderers)
             {
                 itemRenderer.enabled = visible;
             }
 
-            foreach (Collider itemCollider
-                     in itemColliders)
+            foreach (Collider itemCollider in itemColliders)
             {
                 itemCollider.enabled = visible;
             }

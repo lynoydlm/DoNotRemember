@@ -10,13 +10,13 @@ namespace DoNotRemember.Anchor
     {
         public static AnchorManager Instance { get; private set; }
 
-        public event Action<string> AnchorActivated;
+        public event Action<MemoryObjectData> AnchorActivated;
 
         [Header("Anchor Capacity")]
         [Min(1)]
         [SerializeField] private int maxActiveAnchors = 1;
 
-        private readonly List<string> activeAnchors = new();
+        private readonly List<MemoryObjectData> activeAnchors = new();
 
         private void Awake()
         {
@@ -51,10 +51,10 @@ namespace DoNotRemember.Anchor
                 return;
             }
 
-            string itemId =
-                InventoryManager.Instance.LastCollectedItemId;
+            MemoryObjectData itemData =
+                InventoryManager.Instance.LastCollectedItem;
 
-            if (string.IsNullOrEmpty(itemId))
+            if (itemData == null)
             {
                 InventoryManager.Instance.ShowNotification(
                     "Nothing to anchor."
@@ -63,18 +63,31 @@ namespace DoNotRemember.Anchor
                 return;
             }
 
-            TryActivateAnchor(itemId);
+            TryActivateAnchor(itemData);
         }
 
-        public bool TryActivateAnchor(string itemId)
+        public bool TryActivateAnchor(
+            MemoryObjectData itemData)
         {
-            if (InventoryManager.Instance == null)
+            if (InventoryManager.Instance == null ||
+                itemData == null)
+            {
+                return false;
+            }
+
+            if (!InventoryManager.Instance.HasItem(itemData))
                 return false;
 
-            if (!InventoryManager.Instance.HasItem(itemId))
-                return false;
+            if (!itemData.CanBeAnchored)
+            {
+                InventoryManager.Instance.ShowNotification(
+                    "This object cannot be anchored."
+                );
 
-            if (IsAnchored(itemId))
+                return false;
+            }
+
+            if (IsAnchored(itemData))
             {
                 InventoryManager.Instance.ShowNotification(
                     "This object is already anchored."
@@ -92,27 +105,26 @@ namespace DoNotRemember.Anchor
                 return false;
             }
 
-            activeAnchors.Add(itemId);
-
-            string itemName =
-                InventoryManager.Instance.GetItemName(itemId);
+            activeAnchors.Add(itemData);
 
             InventoryManager.Instance.ShowNotification(
-                $"{itemName} ANCHORED"
+                $"{itemData.DisplayName} ANCHORED"
             );
 
             Debug.Log(
-                $"ANCHOR activated: {itemId}"
+                $"ANCHOR activated: {itemData.ObjectId}"
             );
 
-            AnchorActivated?.Invoke(itemId);
+            AnchorActivated?.Invoke(itemData);
 
             return true;
         }
 
-        public bool IsAnchored(string itemId)
+        public bool IsAnchored(
+            MemoryObjectData itemData)
         {
-            return activeAnchors.Contains(itemId);
+            return itemData != null &&
+                   activeAnchors.Contains(itemData);
         }
 
         public void HandleMemoryShift()
@@ -120,25 +132,22 @@ namespace DoNotRemember.Anchor
             if (InventoryManager.Instance == null)
                 return;
 
-            List<string> carriedItems =
-                InventoryManager.Instance.GetItemIdsSnapshot();
+            List<MemoryObjectData> carriedItems =
+                InventoryManager.Instance.GetItemsSnapshot();
 
-            foreach (string itemId in carriedItems)
+            foreach (MemoryObjectData itemData in carriedItems)
             {
-                if (IsAnchored(itemId))
+                if (IsAnchored(itemData))
                     continue;
 
-                string itemName =
-                    InventoryManager.Instance.GetItemName(itemId);
-
-                InventoryManager.Instance.RemoveItem(itemId);
+                InventoryManager.Instance.RemoveItem(itemData);
 
                 InventoryManager.Instance.ShowNotification(
-                    $"{itemName} was lost in the memory shift"
+                    $"{itemData.DisplayName} was lost in the memory shift"
                 );
 
                 Debug.Log(
-                    $"Memory shift removed: {itemId}"
+                    $"Memory shift removed: {itemData.ObjectId}"
                 );
             }
         }

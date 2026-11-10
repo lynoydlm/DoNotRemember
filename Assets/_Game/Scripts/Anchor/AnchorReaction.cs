@@ -6,7 +6,7 @@ namespace DoNotRemember.Anchor
     public class AnchorReaction : MonoBehaviour
     {
         [Header("Condition")]
-        [SerializeField] private string requiredItemId;
+        [SerializeField] private MemoryObjectData requiredObject;
 
         [Header("Reaction")]
         [SerializeField] private GameObject targetObject;
@@ -46,7 +46,8 @@ namespace DoNotRemember.Anchor
             if (AnchorManager.Instance == null)
                 return;
 
-            AnchorManager.Instance.AnchorActivated += OnAnchorActivated;
+            AnchorManager.Instance.AnchorActivated +=
+                OnAnchorActivated;
 
             subscribed = true;
         }
@@ -58,15 +59,17 @@ namespace DoNotRemember.Anchor
 
             if (AnchorManager.Instance != null)
             {
-                AnchorManager.Instance.AnchorActivated -= OnAnchorActivated;
+                AnchorManager.Instance.AnchorActivated -=
+                    OnAnchorActivated;
             }
 
             subscribed = false;
         }
 
-        private void OnAnchorActivated(string itemId)
+        private void OnAnchorActivated(
+            MemoryObjectData itemData)
         {
-            if (itemId != requiredItemId)
+            if (itemData != requiredObject)
                 return;
 
             EvaluateReaction();
@@ -77,14 +80,20 @@ namespace DoNotRemember.Anchor
             if (targetObject == null)
                 return;
 
-            if (AnchorManager.Instance == null)
+            if (AnchorManager.Instance == null ||
+                requiredObject == null)
             {
-                targetObject.SetActive(!showWhenAnchored);
+                targetObject.SetActive(
+                    !showWhenAnchored
+                );
+
                 return;
             }
 
             bool anchored =
-                AnchorManager.Instance.IsAnchored(requiredItemId);
+                AnchorManager.Instance.IsAnchored(
+                    requiredObject
+                );
 
             targetObject.SetActive(
                 showWhenAnchored

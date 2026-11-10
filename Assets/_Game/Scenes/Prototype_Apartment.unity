@@ -1270,7 +1270,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DoNotRemember.Interaction.LockedDoor
   interactionText: Open door
-  requiredItemId: apartment_key
+  requiredObject: {fileID: 11400000, guid: ec9a5cbaec44f3f4b9a57d1f515ff915, type: 2}
   openAngle: 90
   openSpeed: 3
 --- !u!1 &387556491
@@ -3823,8 +3823,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DoNotRemember.Interaction.PickupObject
   interactionText: Take key
-  itemId: apartment_key
-  itemName: Apartment Key
+  objectData: {fileID: 11400000, guid: ec9a5cbaec44f3f4b9a57d1f515ff915, type: 2}
 --- !u!1 &1117304310
 GameObject:
   m_ObjectHideFlags: 0
@@ -5142,6 +5141,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 188899b8776aff046b732e06d927a1ba, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DoNotRemember.Anchor.AnchorManager
+  maxActiveAnchors: 1
 --- !u!1 &1502929607
 GameObject:
   m_ObjectHideFlags: 0
@@ -6243,7 +6243,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 096e226fdec27574d9f98d59ffa4f48d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DoNotRemember.Anchor.AnchorReaction
-  requiredItemId: apartment_key
+  requiredObject: {fileID: 11400000, guid: ec9a5cbaec44f3f4b9a57d1f515ff915, type: 2}
   targetObject: {fileID: 444951102}
   showWhenAnchored: 1
 --- !u!1 &1932740750
