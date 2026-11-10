@@ -8,31 +8,18 @@ namespace DoNotRemember.Core
     {
         public static InventoryManager Instance { get; private set; }
 
-        private class InventoryItem
-        {
-            public string Id;
-            public string Name;
-            public bool IsAnchored;
-
-            public InventoryItem(string id, string name)
-            {
-                Id = id;
-                Name = name;
-                IsAnchored = false;
-            }
-        }
-
         [Header("UI")]
         [SerializeField] private TMP_Text notificationText;
 
         [Header("Notification")]
         [SerializeField] private float notificationDuration = 2.5f;
 
-        private readonly Dictionary<string, InventoryItem> items = new();
+        private readonly Dictionary<string, string> items = new();
 
         private string lastCollectedItemId;
-
         private float notificationTimer;
+
+        public string LastCollectedItemId => lastCollectedItemId;
 
         private void Awake()
         {
@@ -67,19 +54,17 @@ namespace DoNotRemember.Core
         {
             if (string.IsNullOrWhiteSpace(itemId))
             {
-                Debug.LogError("InventoryManager: Item ID is empty.");
+                Debug.LogError(
+                    "InventoryManager: Item ID is empty."
+                );
+
                 return false;
             }
 
             if (items.ContainsKey(itemId))
                 return false;
 
-            InventoryItem newItem = new InventoryItem(
-                itemId,
-                itemName
-            );
-
-            items.Add(itemId, newItem);
+            items.Add(itemId, itemName);
 
             lastCollectedItemId = itemId;
 
@@ -87,7 +72,9 @@ namespace DoNotRemember.Core
                 $"{itemName} added\n[R] Anchor item"
             );
 
-            Debug.Log($"Inventory: added {itemId}");
+            Debug.Log(
+                $"Inventory: added {itemId}"
+            );
 
             return true;
         }
@@ -97,74 +84,34 @@ namespace DoNotRemember.Core
             return items.ContainsKey(itemId);
         }
 
-        public bool IsAnchored(string itemId)
+        public string GetItemName(string itemId)
         {
-            if (!items.TryGetValue(itemId, out InventoryItem item))
-                return false;
+            if (items.TryGetValue(
+                    itemId,
+                    out string itemName))
+            {
+                return itemName;
+            }
 
-            return item.IsAnchored;
+            return itemId;
         }
 
-        public bool AnchorLastCollectedItem()
+        public List<string> GetItemIdsSnapshot()
         {
-            if (string.IsNullOrEmpty(lastCollectedItemId))
-                return false;
-
-            if (!items.TryGetValue(
-                    lastCollectedItemId,
-                    out InventoryItem item))
-            {
-                return false;
-            }
-
-            if (item.IsAnchored)
-                return false;
-
-            item.IsAnchored = true;
-
-            ShowNotification(
-                $"{item.Name} ANCHORED"
-            );
-
-            Debug.Log(
-                $"Inventory: anchored {item.Id}"
-            );
-
-            return true;
+            return new List<string>(items.Keys);
         }
 
-        public void RemoveUnanchoredItems()
+        public bool RemoveItem(string itemId)
         {
-            List<string> itemsToRemove = new();
+            bool removed = items.Remove(itemId);
 
-            foreach (KeyValuePair<string, InventoryItem> pair in items)
-            {
-                if (!pair.Value.IsAnchored)
-                {
-                    itemsToRemove.Add(pair.Key);
-                }
-            }
-
-            foreach (string itemId in itemsToRemove)
-            {
-                InventoryItem item = items[itemId];
-
-                items.Remove(itemId);
-
-                Debug.Log(
-                    $"Memory shift removed unanchored item: {item.Name}"
-                );
-
-                ShowNotification(
-                    $"{item.Name} was lost in the memory shift"
-                );
-            }
-
-            if (!string.IsNullOrEmpty(lastCollectedItemId) &&
-                !items.ContainsKey(lastCollectedItemId))
+            if (removed &&
+                lastCollectedItemId == itemId)
             {
                 lastCollectedItemId = null;
             }
+
+            return removed;
         }
 
         public void ShowNotification(string message)

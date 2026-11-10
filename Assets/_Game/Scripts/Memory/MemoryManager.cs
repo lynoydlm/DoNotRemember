@@ -1,5 +1,5 @@
 using System;
-using DoNotRemember.Core;
+using DoNotRemember.Anchor;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -146,13 +146,12 @@ namespace DoNotRemember.Memory
 
         private void ApplyMemory(
             int index,
-            bool clearUnanchoredItems)
+            bool handleMemoryShift)
         {
-            if (clearUnanchoredItems &&
-                InventoryManager.Instance != null)
+            if (handleMemoryShift &&
+                AnchorManager.Instance != null)
             {
-                InventoryManager.Instance
-                    .RemoveUnanchoredItems();
+                AnchorManager.Instance.HandleMemoryShift();
             }
 
             for (int i = 0;
@@ -183,8 +182,7 @@ namespace DoNotRemember.Memory
             MemoryChanged?.Invoke(CurrentMemory);
         }
 
-        public void SetMemoryInputEnabled(
-            bool enabled)
+        public void SetMemoryInputEnabled(bool enabled)
         {
             memoryInputEnabled = enabled;
         }

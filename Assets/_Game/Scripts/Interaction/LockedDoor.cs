@@ -1,3 +1,4 @@
+using DoNotRemember.Anchor;
 using DoNotRemember.Core;
 using UnityEngine;
 
@@ -49,10 +50,11 @@ namespace DoNotRemember.Interaction
 
         private void TryUnlock()
         {
-            if (InventoryManager.Instance == null)
+            if (InventoryManager.Instance == null ||
+                AnchorManager.Instance == null)
             {
                 Debug.LogError(
-                    "LockedDoor: InventoryManager was not found."
+                    "LockedDoor: required systems were not found."
                 );
 
                 return;
@@ -67,10 +69,10 @@ namespace DoNotRemember.Interaction
                 return;
             }
 
-            if (!InventoryManager.Instance.IsAnchored(requiredItemId))
+            if (!AnchorManager.Instance.IsAnchored(requiredItemId))
             {
                 InventoryManager.Instance.ShowNotification(
-                    "The key does not belong to this memory."
+                    "The object is not anchored in this reconstruction."
                 );
 
                 return;
@@ -91,7 +93,11 @@ namespace DoNotRemember.Interaction
 
             targetRotation =
                 closedRotation *
-                Quaternion.Euler(0f, openAngle, 0f);
+                Quaternion.Euler(
+                    0f,
+                    openAngle,
+                    0f
+                );
         }
     }
 }

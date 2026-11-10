@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Echo_TestMmeory
   m_EditorClassIdentifier: Assembly-CSharp::DoNotRemember.Narrative.EchoData
   echoType: 0
-  speaker: 
-  subtitle: 
+  speaker: TEST
+  subtitle: This is a test memory fragment.
   audioClip: {fileID: 0}
   fallbackDuration: 3.5
