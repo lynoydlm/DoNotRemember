@@ -1,3 +1,4 @@
+using System;
 using DoNotRemember.Core;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -12,10 +13,14 @@ namespace DoNotRemember.Memory
         [Header("Starting Memory")]
         [SerializeField] private int startingMemoryIndex = 0;
 
+        [Header("Transition")]
+        [SerializeField] private MemoryTransition memoryTransition;
+
         private int currentMemoryIndex;
 
-        private bool memoryInitialized;
         private bool memoryInputEnabled = true;
+
+        public event Action<MemoryLayer> MemoryChanged;
 
         public MemoryLayer CurrentMemory
         {
@@ -49,12 +54,10 @@ namespace DoNotRemember.Memory
                 memoryLayers.Length - 1
             );
 
-            ActivateMemory(
+            ApplyMemory(
                 currentMemoryIndex,
                 false
             );
-
-            memoryInitialized = true;
         }
 
         private void Update()
@@ -64,6 +67,12 @@ namespace DoNotRemember.Memory
 
             if (Keyboard.current == null)
                 return;
+
+            if (memoryTransition != null &&
+                memoryTransition.IsTransitioning)
+            {
+                return;
+            }
 
             if (Keyboard.current.eKey.wasPressedThisFrame)
             {
@@ -84,14 +93,15 @@ namespace DoNotRemember.Memory
                 return;
             }
 
-            int nextIndex = currentMemoryIndex + 1;
+            int nextIndex =
+                currentMemoryIndex + 1;
 
             if (nextIndex >= memoryLayers.Length)
             {
                 nextIndex = 0;
             }
 
-            ActivateMemory(nextIndex);
+            RequestMemoryChange(nextIndex);
         }
 
         public void PreviousMemory()
@@ -102,7 +112,8 @@ namespace DoNotRemember.Memory
                 return;
             }
 
-            int previousIndex = currentMemoryIndex - 1;
+            int previousIndex =
+                currentMemoryIndex - 1;
 
             if (previousIndex < 0)
             {
@@ -110,28 +121,34 @@ namespace DoNotRemember.Memory
                     memoryLayers.Length - 1;
             }
 
-            ActivateMemory(previousIndex);
+            RequestMemoryChange(previousIndex);
         }
 
-        public void SetMemoryInputEnabled(bool enabled)
+        private void RequestMemoryChange(int index)
         {
-            memoryInputEnabled = enabled;
-        }
-        public void ActivateMemory(
-            int index,
-            bool clearUnanchoredItems = true)
-        {
-            if (memoryLayers == null)
-                return;
-
             if (index < 0 ||
                 index >= memoryLayers.Length)
             {
                 return;
             }
 
-            if (memoryInitialized &&
-                clearUnanchoredItems &&
+            if (memoryTransition != null)
+            {
+                memoryTransition.PlayTransition(
+                    () => ApplyMemory(index, true)
+                );
+            }
+            else
+            {
+                ApplyMemory(index, true);
+            }
+        }
+
+        private void ApplyMemory(
+            int index,
+            bool clearUnanchoredItems)
+        {
+            if (clearUnanchoredItems &&
                 InventoryManager.Instance != null)
             {
                 InventoryManager.Instance
@@ -162,6 +179,14 @@ namespace DoNotRemember.Memory
                 $"{CurrentMemory.MemoryTime} — " +
                 $"{CurrentMemory.MemoryName}"
             );
+
+            MemoryChanged?.Invoke(CurrentMemory);
+        }
+
+        public void SetMemoryInputEnabled(
+            bool enabled)
+        {
+            memoryInputEnabled = enabled;
         }
     }
 }
